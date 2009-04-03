@@ -18,7 +18,8 @@
 // @name          JIRA Awesomizer v0.1
 // @namespace     http://github.com/anutron/jira-awesomizer/tree/master
 // @description   Makes JIRA a little less suxxors
-// @include       https://jira.cloudera.com/*
+// @include       https://jira.*.com/*
+// @include       http://jira.*.com/*
 // @unwrap
 // ==/UserScript==
 var injector = function(url) {
