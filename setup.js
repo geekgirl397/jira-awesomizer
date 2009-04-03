@@ -9,6 +9,6 @@ if (include) {
 		s.src = url;
 		document.getElementsByTagName('head')[0].appendChild(s);
 	};
-	injector("http://localhost/dev/jira/moo.js");
-	injector("http://localhost/dev/jira/awesome.js");
+	injector("http://www.clientcide.com/dev/jira/moo.js");
+	injector("http://www.clientcide.com/dev/jira/awesome.js");
 }

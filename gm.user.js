@@ -26,4 +26,4 @@ var injector = function(url) {
 	s.src = url;
 	document.getElementsByTagName('head')[0].appendChild(s);
 };
-injector("http://localhost/dev/jira/setup.js");
+injector("http://www.clientcide.com/dev/jira/setup.js");

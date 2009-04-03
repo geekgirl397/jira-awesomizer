@@ -22,7 +22,7 @@ The code for this is all JavaScript, but it's designed for to be able to quickly
 * "load more" link that just fetches more issues
 * the ability to refresh a single item in the list
 
-# Environment
+## Environment
 
 As mentioned above, this uses MooTools. Specifically, it uses MooTools 1.2.2 (which is not released yet), MooTools More RC2 (also not yet released), and the version of [Clientcide](http://www.clientcide,com) libs that have been reworked for those two libraries ([available on github](http://github.com/anutron/clientcide/tree/master)). There is a bash script (jira.sh) that will build moo.js for you (but not compress it) included in these files. It references "../mootools/clientcide" which is where I have my version of the clientcide repo. Specifically, I have the following:
 
@@ -30,3 +30,7 @@ As mentioned above, this uses MooTools. Specifically, it uses MooTools 1.2.2 (wh
 * mootools/clientcide
 * mootools/core
 * mootools/more
+
+### Hosting
+
+Currently these scripts 
