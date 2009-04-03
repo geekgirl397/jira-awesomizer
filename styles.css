@@ -1,0 +1,25 @@
+a.shortcut {
+	padding: 0px 8px 0px 0px;
+	color: #999;
+	text-decoration: none;
+}
+div.mainLinks {
+	padding: 4px 0px;
+	text-align: right;
+}
+div.mainLinks:hover a.shortcut {
+	color: #003366;
+}
+a {
+	cursor: pointer;
+}
+td.inProgress {
+	background: #d4e5fd;
+}
+.overTxtDiv {
+	color: #999;
+	margin: 4px;
+}
+td {
+	vertical-align: top;
+}
