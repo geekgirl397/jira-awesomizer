@@ -16,7 +16,7 @@
 //
 // ==UserScript==
 // @name          JIRA Awesomizer v0.1
-// @namespace     http://wiki.cloudera.com/greasemonkey
+// @namespace     http://github.com/anutron/jira-awesomizer/tree/master
 // @description   Makes JIRA a little less suxxors
 // @include       https://jira.cloudera.com/*
 // @unwrap
