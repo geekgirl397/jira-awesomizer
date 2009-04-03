@@ -33,4 +33,4 @@ As mentioned above, this uses MooTools. Specifically, it uses MooTools 1.2.2 (wh
 
 ### Hosting
 
-Currently these scripts 
+Currently these scripts point to [http://www.clientcide.com/jira](http://www.clientcide.com/jira) where I host them. They need to go somewhere (you can host them on your computer and point to localhost and it'll be faster; that's what I do for development; I'll make this configurable at some point).
