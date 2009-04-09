@@ -6,13 +6,15 @@
 
 ## Details and whatnot:
 
-This "plugin" will add new links to the standard dashboard issues list (for instance "Open Issues: Assigned to Me" as a dashboard widget; you can also use the "Show Saved Filter" widget). These links are for things like logging work, editing tasks, etc. All of these links will open a little in-page modal window to let you make the change you want to. When you submit the form in the popup it will do so via ajax and display the results in the popup (see screen shots in the files included). This doesn't always work but it seems to 95% of the time (resolving an issue sometimes breaks; I'll work on it). You should, in theory, be able to submit the form more than once (if you get an error for example). Links in the popup, however, will always open in a new window/tab.
+This "plugin" will add new links to the standard dashboard issues list (for instance "Open Issues: Assigned to Me" as a dashboard widget; you can also use the "Show Saved Filter" widget) as well as the search results page. These links are for things like logging work, editing tasks, etc. All of these links will open a little in-page modal window to let you make the change you want to. When you submit the form in the popup it will do so via ajax and display the results in the popup (see screen shots in the files included). This doesn't always work but it seems to 95% of the time (resolving an issue sometimes breaks; I'll work on it). You should, in theory, be able to submit the form more than once (if you get an error for example). Links in the popup, however, will always open in a new window/tab.
 
-There is a "filter" field at the top of the dashboard that lets you type in anything and it'll filter the content of the dashboard for you (known issue: if you have more than one widget, there's only one search box for all of them; I'll work on it). Each item in the dashboard also now shows its status ("in progress" items are highlighted). So, for instance, you can type into the filter "in progress" and all the items marked as such will be displayed and everything else will disappear.
+There is a "filter" field at the top of the dashboard and search pages that lets you type in anything and it'll filter the content of the dashboard/filter for you. Each item in the dashboard also now shows its status ("in progress" items are highlighted). So, for instance, you can type into the filter "in progress" and all the items marked as such will be displayed and everything else will disappear.
 
 Currently changes to items do not update them (so if you change the status of an item from open to in progress, you'll have to reload to see that change in the dashboard).
 
 This slows the page load down for the dashboard considerably. If you want to turn it off, just disable greasemonkey. Best not to open a popup until it's finished fetching all the issues (you can see them load).
+
+## Known Conflict
 
 This uses MooTools and there are a few dashboard plugins that include Prototype.js, which conflicts with MooTools. If you use one of these, you'll get a javascript error (several, probably). You can either not use the Awesomizer, remove these plugins from your Dashboard, or write your own damn script. The known conflicting widget is the "Favorite Filters" widget.
 
