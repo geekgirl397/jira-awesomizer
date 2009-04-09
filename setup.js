@@ -1,4 +1,4 @@
-var testFor = ["Dashboard.jspa"];
+var testFor = ["Dashboard.jspa", "IssueNavigator.jspa"];
 var include;
 for (var i = 0; i < testFor.length; i++) {
 	if (document.location.href.indexOf(testFor[i]) >= 0) include = true;
@@ -9,6 +9,6 @@ if (include) {
 		s.src = url;
 		document.getElementsByTagName('head')[0].appendChild(s);
 	};
-	injector("http://www.clientcide.com/jira/moo.js");
-	injector("http://www.clientcide.com/jira/awesome.js");
+	injector("http://www.epitonic.org/jira/moo.js");
+	injector("http://www.epitonic.org/jira/awesome.js");
 }

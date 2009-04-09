@@ -1,10 +1,16 @@
 if (document.body.getElement('*')) {
+	if (Calendar) {
+		Calendar.setupOrg = Calendar.setup;
+		Calendar.setup = function(){
+			dbug.log('cal: ', arguments)
+		}
+	}
 	//add our css
 	document.head.adopt(new Element('link', {
 		type: 'text/css',
 		rel: 'StyleSheet',
 		media: 'all',
-		href: 'http://www.clientcide.com/jira/styles.css'
+		href: 'http://www.epitonic.org/jira/styles.css'
 	}));
 	//let's make Request.HTML integrate with our app a bit
 	//we need to scrap pages a lot to get chunks of the response
@@ -52,15 +58,16 @@ if (document.body.getElement('*')) {
 			var tester;
 			//make our input
 			this.search = new Element('input', {
-				title: 'filter items',
+				title: 'filter items (esc clears)',
 				events: {
 					keyup: function(e) {
+						if (e.key == "esc") this.search.set('value', '');
 						$clear(tester);
 						//let's not overload the browser as the user types; wait a little for another keystroke
 						tester = function(){
 							//loop though the elements and hide the ones that don't match the filter
 							this.elements.each(function(el, i){
-								var txt = (this.options.textFilter ? el.getElements(this.options.textFilter) : [el]).get('html').join(' ');
+								var txt = (this.options.textFilter ? el.getElements(this.options.textFilter) : $$([el])).get('html').join(' ');
 								if (!txt.toLowerCase().contains(this.search.get('value').toLowerCase())) this.containers[i].hide();
 								else this.containers[i].show(this.options.display);
 							}, this)
@@ -200,7 +207,7 @@ if (document.body.getElement('*')) {
 		},
 		//url patterns for pages
 		urls: {
-			startReview: "/secure/WorkflowUIDispatcher.jspa?id={intId}&action=731",
+			startReview: "/secure/WorkflowUIDispatcher.jspa?id={intId}&action=5",
 			resolveIssue: "/secure/WorkflowUIDispatcher.jspa?id={intId}&action=711",
 			quickResolve: "/secure/CommentAssignIssue.jspa?customfield_10011=https%3A%2F%2Fgit.cloudera.com%2Freviewboard%2Fr%2F279%2F&timetracking=0m&action=711&id={intId}&viewIssueKey=&Resolve Issue=Resolve%20Issue&/browse/{id}=Cancel&assignee={user}&resolution=1",
 			startProgress: "/secure/WorkflowUIDispatcher.jspa?id={intId}&action=4",
@@ -214,6 +221,7 @@ if (document.body.getElement('*')) {
 			new Request.HTML({
 				url: options.href || awesome.getTaskUrl(options.id, options.intId, options.task),
 				filter: task,
+				evalScripts: false,
 				onComplete: function(tree, elements){
 					//call the callback
 					(onComplete || $empty)();
@@ -265,36 +273,221 @@ if (document.body.getElement('*')) {
 		//the name of the view ("Dashboard") will be checked against the window.location
 		//so "Dashboard" will only run if the window.location contains "Dashboard"
 		views: $H({
-			Dashboard: new Class({
+			IssueNavigator: new Class({
+				Implements: Events,
+				Binds:[],
 				initialize: function(){
-					var searchTr;
+					this.container = $('issuetable');
+					if (!this.container) return;
+					this.searchbox = new Element('div', {
+						'class':'searchBoxContainer'
+					}).inject(this.container, 'before');
+					this.awesomeize.delay(200, this);
+				},
+				awesomeize: function(e){
+					dbug.log('awesomizing')
+					if (e && e.stop) e.stop();
+					// this.loader.set('html', 'awesomizing...').removeEvents('click');
+					this.search = new SearchFilter(this.searchbox, {
+						textFilter: false
+					});
+					this.enhanceTable(this.container);
+					this.addEvent('tableLoaded', function(){
+						this.fireEvent('awesomed');
+					}.bind(this));
+				},
+				enhanceTable: function(table){
+					var enhance;
 					//get all the table rows in the dashboard
-					$$('table[id^=searchresults] tr').each(function(tr, i) {
+					table.getElements('tr[id^=issuerow]').each(function(tr, i) {
+						this.search.addElement(tr, tr);
+						//get the td with the link in it
+						var td = tr.getElement('td.issuekey');
+						//if not there, this is the top row; we'll put our search box here
+						if (!td) return;
+						enhance = true;
+						//get the link to the bug
+						var browse = td.getElement('a').get('href');
+						//get the id for the bug
+						var id = awesome.getBugId(browse);
+						this.setupEnhance(td, id);
+					}, this);
+					this.fireEvent('tableLoaded');
+				},
+				setupEnhance: function(td, id) {
+					var tr = td.getParent('tr');
+					td = tr.getElement('td.summary');
+					//add a class to this td for styling
+					tr.addClass('enhanced');
+					var timer, loaded;
+					var linkContainer = new Element('div', {
+						'class':'mainLinks',
+						events: {
+							mouseenter: function(){
+								$clear(timer);
+								if (loaded) return;
+								timer = function(){
+									loaded = true;
+									this.enhanceTd(td, id);
+								}.delay(300, this)
+							}.bind(this),
+							mouseleave: function(){
+								$clear(timer)
+							},
+							click: function(){
+								if (loaded) return;
+								loaded = true;
+								this.enhanceTd(td, id);
+							}.bind(this)
+						}
+					}).inject(td);
+					['edit','startReview','resolveIssue', 'quickResolve','startProgress','addProgress','logWork'].each(function(txt) {
+						linkContainer.adopt(new Element('a', {
+							'class':'disabled',
+							'html':txt
+						}))
+					});
+					var position = function(){
+						linkContainer.position({
+							relativeTo: tr,
+							edge: 'topRight',
+							position: 'bottomRight',
+							offset:{
+								x: 1
+							}
+						}).setStyle('display', '');
+					};
+					tr.addEvent('mouseover', position);
+				},
+				enhanceTd: function(td, id) {
+					td.getElement('.mainLinks').removeEvents().wait();
+					//get the link to the bug
+					var browse = td.getElement('a').get('href');
+					//fetch the bug's browse page
+					new Request.HTML({
+						url: browse,
+						evalScripts: false,
+						onSuccess: function(tree, elements, html, js){
+							//enhance the table row
+							this.enhanceBugLink(td, id, html, elements)
+						}.bind(this)
+					}).send();
+				},
+				enhanceBugLink: function(td, id, html, elements){
+					var tr = td.getParent('tr');
+					td = tr.getElement('td.summary');
+					var linkContainer = td.getElement('div.mainLinks').release().empty();
+					//get the intId for the bug
+					var intId = awesome.getIntId(html);
+					if (!intId) return;
+					//get the link that's there and add a class to it for styling
+					var link = td.getElement('a').addClass('browser');
+					//create links for all our actions
+					var mainLinks = ['edit','startReview','resolveIssue',
+					 				 'quickResolve','startProgress','addProgress','logWork'].map(function(task){
+						var a = awesome.linkTo(id, intId, task)
+						//drop the link in after our main link
+						a.inject(linkContainer);
+						return a;
+					}, this);
+					//fetch the comments
+					var comments = awesome.filter('comments', elements);
+					if (comments) {
+						if (!comments.get('html').contains('No work has yet been logged on this issue.') &&
+							!comments.get('html').contains('There are no comments yet on this issue.')) {
+							//create a link to preview the comments
+							var preview = new Element('a', {
+								html: 'show comments',
+								href: 'javascript:void(0)',
+								'class':'shortcut',
+								events: {
+									click: function(e){
+										e.stop();
+										comments.get('reveal').toggle();
+									}
+								}
+							}).inject(linkContainer, 'top');
+							mainLinks.push(preview);
+							var ctr = new Element('tr').inject(tr, 'after').addClass('awesomeComments')
+							var ctd = new Element('td', {
+								colspan: tr.getChildren('td').length
+							}).inject(ctr);
+							comments.hide().inject(ctd);
+						}
+					}
+					linkContainer.position({
+						relativeTo: tr,
+						edge: 'topRight',
+						position: 'bottomRight',
+						offset:{
+							x: 1
+						}
+					}).setStyle('display', '');
+				}
+			}),
+			Dashboard: new Class({
+				Implements: Events,
+				Binds: ['enhanceTable'],
+				initialize: function(){
+					this.tables = $$('table[id^=searchresults]');
+					this.completed = []
+					var container = document.getElement('table');
+					this.tables.each(this.enhanceTable);
+					this.addEvent('tableLoaded', function(t){
+						this.completed.include(t);
+						var complete = true;
+						this.tables.each(function(t){
+							if (!this.completed.contains(t)) complete = false;
+						}, this);
+						if (complete) this.fireEvent('awesomed');
+					}.bind(this));
+					this.addEvent("awesomed", function(){
+						OverText.update();
+					});
+				},
+				enhanceTable: function(table){
+					var searchTr = table.getElement('tr.rowHeader'),
+						enhance, 
+						requests = [];
+					//get all the table rows in the dashboard
+					table.getElements('tr').each(function(tr, i) {
 						//get the td with the link in it
 						var td = tr.getElements('td')[2];
 						//if not there, this is the top row; we'll put our search box here
-						if (!td) return searchTr = tr;
+						if (!td) return;
+						enhance = true;
 						//get the link to the bug
 						var browse = td.getElement('a').get('href');
 						//get the id for the bug
 						var id = awesome.getBugId(browse);
 						//fetch the bug's browse page
-						new Request.HTML({
+						requests[i] = new Request.HTML({
 							url: browse,
 							onSuccess: function(tree, elements, html, js){
 								//enhance the table row
 								this.enhanceBugLink(td, id, html, elements)
+								requests[i] = false;
+								if (!requests.some(function(r){ return r })) {
+									this.fireEvent('tableLoaded', table);
+								}
 							}.bind(this)
 						}).send();
 					}, this);
 					//add our search filter
-					this.searchFilter = new SearchFilter(searchTr.getElement('td'))
+					if (enhance) {
+						table.store('searchFilter', new SearchFilter(searchTr.getElement('td')));
+					} else {
+						this.completed.include(table);
+					}
 				},
 				enhanceBugLink: function(td, id, html, elements){
-					//add this row to the search filter
-					this.searchFilter.addElement(td, td.getParent('tr'));
 					//get the intId for the bug
 					var intId = awesome.getIntId(html);
+					if (!intId) return;
+					//add this row to the search filter
+					var table = td.getParent('table');
+					var searchFilter = table.retrieve('searchFilter');
+					searchFilter.addElement(td, td.getParent('tr'));
 					//add a class to this td for styling
 					td.addClass('enhanced');
 					//get the link that's there and add a class to it for styling
@@ -350,6 +543,9 @@ if (document.body.getElement('*')) {
 		awesome.init();
 		//if the window location matches the name of this view
 		//execute that view
-		if (document.location.href.contains(view)) new klass();
+		if (document.location.href.contains(view)) {
+			new klass();
+			document.body.addClass(view);
+		}
 	});
 }

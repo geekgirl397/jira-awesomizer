@@ -1,4 +1,4 @@
-a.shortcut {
+a.shortcut, a.disabled {
 	padding: 0px 8px 0px 0px;
 	color: #999;
 	text-decoration: none;
@@ -6,6 +6,31 @@ a.shortcut {
 div.mainLinks {
 	padding: 4px 0px;
 	text-align: right;
+}
+.IssueNavigator div.mainLinks {
+	background: #FFFFFF;
+	border: solid #999999;
+	border-width: 0px 1px 1px;
+	position:absolute;
+	display: none;
+	padding: 4px 8px;
+	width: 700px;
+	z-index:10;
+}
+.IssueNavigator tr.rowAlternate div.mainLinks {
+	background: #FFFFF0;
+}
+.IssueNavigator tr.enhanced:hover div.mainLinks {
+	display:block;
+}
+.IssueNavigator tr.enhanced:hover a.shortcut{
+	color: #003366;
+}
+.IssueNavigator tr.enhanced td {
+	position: relative;
+}
+tr.enhanced button, tr.enhanced a {
+	cursor: pointer;
 }
 div.mainLinks:hover a.shortcut {
 	color: #003366;
@@ -18,8 +43,21 @@ td.inProgress {
 }
 .overTxtDiv {
 	color: #999;
-	margin: 4px;
+	margin: 4px 0px;
 }
 td {
 	vertical-align: top;
+}
+.awesomeComments td {
+	border-width: 0px;
+	padding: 0px;
+}
+div.searchBoxContainer {
+	height:27px;
+	width:100%;
+	background: #fff;
+}
+a.disabled {
+	color: #777;
+	cursor: pointer;
 }
