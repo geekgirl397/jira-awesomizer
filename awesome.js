@@ -10,7 +10,7 @@ if (document.body.getElement('*')) {
 		type: 'text/css',
 		rel: 'StyleSheet',
 		media: 'all',
-		href: 'http://www.epitonic.org/jira/styles.css'
+		href: 'http://www.clientcide.com/jira/styles.css'
 	}));
 	//let's make Request.HTML integrate with our app a bit
 	//we need to scrap pages a lot to get chunks of the response

@@ -27,4 +27,4 @@ var injector = function(url) {
 	s.src = url;
 	document.getElementsByTagName('head')[0].appendChild(s);
 };
-injector("http://www.epitonic.org/jira/setup.js");
+injector("http://www.clientcide.com/jira/setup.js");
