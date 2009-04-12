@@ -1,5 +1,5 @@
 if (document.body.getElement('*')) {
-	if (Calendar) {
+	if (window.Calendar) {
 		Calendar.setupOrg = Calendar.setup;
 		Calendar.setup = function(){
 			dbug.log('cal: ', arguments)
