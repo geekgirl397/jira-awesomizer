@@ -1,10 +1,4 @@
 if (document.body.getElement('*')) {
-	if (window.Calendar) {
-		Calendar.setupOrg = Calendar.setup;
-		Calendar.setup = function(){
-			dbug.log('cal: ', arguments)
-		}
-	}
 	//add our css
 	document.head.adopt(new Element('link', {
 		type: 'text/css',
@@ -284,6 +278,14 @@ if (document.body.getElement('*')) {
 					}).inject(this.container, 'before');
 					this.awesomeize.delay(200, this);
 				},
+				disableCalendar: function(){
+					if (window.Calendar) {
+						Calendar.setupOrg = Calendar.setup;
+						Calendar.setup = function(){
+							dbug.log('cal: ', arguments)
+						}
+					}
+				},
 				awesomeize: function(e){
 					dbug.log('awesomizing')
 					if (e && e.stop) e.stop();
@@ -360,6 +362,7 @@ if (document.body.getElement('*')) {
 					tr.addEvent('mouseover', position);
 				},
 				enhanceTd: function(td, id) {
+					this.disableCalendar();
 					td.getElement('.mainLinks').removeEvents().wait();
 					//get the link to the bug
 					var browse = td.getElement('a').get('href');
